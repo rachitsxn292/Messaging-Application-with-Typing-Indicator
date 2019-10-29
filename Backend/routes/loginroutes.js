@@ -19,7 +19,6 @@ exports.register = function(req, res) {
   console.log("Print here + " + req.body.cuisine + req.body.name);
   var owner = {
     name: req.body.name,
-    zipcode: req.body.zipcode,
     id: id,
     email: req.body.email,
     password: req.body.password,
