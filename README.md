@@ -1,1 +1,3 @@
-# Messaging_web_app_w_distributed_system
+npm install
+npm start
+npm test
