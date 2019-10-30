@@ -2,17 +2,18 @@ var MongoClient = require("mongodb").MongoClient;
 var assert = require("assert");
 // connect string for mongodb server running locally, connecting to a database called test
 var url = "mongodb://127.0.0.1:27017";
-const dbName = "grabhub";
+const dbName = "messageApp";
 var mongodb;
 const options1 = {
   useUnifiedTopology: true
 };
 
 exports.getMessageList = function(req, res) {
-  console.log("Print id  " + req.query.orderId);
+  console.log("Print id  " + req.query.roomId);
   var data = {
-    buyerId: req.query.buyerId,
-    orderId: req.query.orderId
+    // buyerId: req.query.buyerId,
+    // orderId: req.query.orderId
+    roomId: req.query.roomId
   };
   MongoClient.connect(url, options1, function(err, client) {
     assert.equal(null, err);
@@ -20,7 +21,7 @@ exports.getMessageList = function(req, res) {
     const db = client.db(dbName);
     mongodb = db;
     db.collection("messages")
-      .find({ id: data.orderId })
+      .find({ id: data.roomId })
       .toArray(function(err, result) {
         if (err) throw err;
         // console.log(result);
