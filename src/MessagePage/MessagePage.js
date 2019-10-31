@@ -24,7 +24,7 @@ class MessagePage extends React.Component {
     this.state = {
       fake_messages: DUMMY_DATA,
       messages: [],
-      rommId: data._id
+      roomId: data._id
     };
     axios
       .get("http://localhost:5000/api/getMessageList", {

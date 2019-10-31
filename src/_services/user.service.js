@@ -17,7 +17,7 @@ function login(email, password) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password })
   };
-  return fetch("http://localhost:5000/api/restaurant/login", requestOptions)
+  return fetch("http://localhost:5000/api/login", requestOptions)
     .then(handleResponse)
     .then(user => {
       // store user details and jwt token in local storage to keep user logged in between page refreshes
@@ -59,10 +59,9 @@ function register(user) {
     body: JSON.stringify(user)
   };
 
-  return fetch(
-    "http://localhost:5000/api/restaurant/register",
-    requestOptions
-  ).then(handleResponse);
+  return fetch("http://localhost:5000/api/register", requestOptions).then(
+    handleResponse
+  );
 }
 
 function update(user) {

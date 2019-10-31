@@ -22,8 +22,7 @@ exports.register = function(req, res) {
     id: id,
     email: req.body.email,
     password: req.body.password,
-    created: today,
-    modified: today
+    created: today
   };
   connection.query("INSERT INTO owner SET ?", owner, function(
     error,
