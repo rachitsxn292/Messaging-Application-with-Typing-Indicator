@@ -18,6 +18,17 @@ var router = express.Router();
 router.get("/", function(req, res) {
   res.json({ message: "welcome to our upload module apis" });
 });
+
+//mongo
+
+const mongoose= require('mongoose');
+mongoose.connect('mongodb+srv://junlan:abcdefg@123@cluster0-ghofm.mongodb.net/test?retryWrites=true&w=majority', {useNewUrlParser: true ,poolSize:100})
+.then(result => {
+  console.log("connected to mongo");
+})
+.catch(err =>{
+  console.log(err);
+});
 //route
 router.post("/register", login.register);
 router.post("/login", login.login);
