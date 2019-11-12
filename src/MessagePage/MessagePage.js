@@ -26,17 +26,25 @@ class MessagePage extends React.Component {
       messages: [],
       roomId: data._id
     };
-    axios
-      .get("http://localhost:5000/api/getMessageList", {
-        params: {
-          roomId: data._id
-        }
-      })
-      .then(response => {
-        this.setState({
-          messages: this.state.messages.concat(response.data)
+  }
+
+  /*Getting messages from the backend every 1 second */
+  componentDidMount() {
+    var self = this;
+    const { data } = this.props.location;
+    setInterval(function() {
+      axios
+        .get("http://localhost:5000/api/getMessageList", {
+          params: {
+            roomId: data._id
+          }
+        })
+        .then(response => {
+          self.setState({
+            messages: response.data
+          });
         });
-      });
+    }, 1000);
   }
 
   render() {
