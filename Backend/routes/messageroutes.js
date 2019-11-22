@@ -1,13 +1,3 @@
-var MongoClient = require("mongodb").MongoClient;
-var assert = require("assert");
-// connect string for mongodb server running locally, connecting to a database called test
-var url = "mongodb://127.0.0.1:27017";
-const dbName = "messageApp";
-var mongodb;
-const options1 = {
-  useUnifiedTopology: true
-};
-
 const mongoose = require("mongoose");
 const chatroom = require("../schema/chatroom_model");
 const message = require("../schema/message_model");
