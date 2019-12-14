@@ -1,6 +1,20 @@
 import React from "react";
 import "./style.css";
 import axios from "axios";
+///
+// const process = require('process');
+// process.stdin.setEncoding('utf8');
+///
+// const readline = require('readline');
+// readline.emitKeypressEvents(process.stdin);
+// process.stdin.setRawMode(true);
+
+// var stdin = process.stdin;
+// stdin.setRawMode(true);
+import openSocket from 'socket.io-client';
+const socket = openSocket('http://localhost:8000');
+
+
 const DUMMY_DATA = [
   {
     senderId: "perborgen",
@@ -15,6 +29,9 @@ const DUMMY_DATA = [
     text: "hello"
   }
 ];
+///
+
+///
 class MessagePage extends React.Component {
   constructor(props) {
     super(props);
@@ -24,14 +41,42 @@ class MessagePage extends React.Component {
     this.state = {
       fake_messages: DUMMY_DATA,
       messages: [],
-      roomId: data._id
+      roomId: data._id,
+      typing_state: false,
+      typing_msg: '',
+      mssg: ''
     };
+    this.sendSocketIO = this.sendSocketIO.bind(this);
   }
 
   /*Getting messages from the backend every 1 second */
   componentDidMount() {
+    // this.msg.addEventListener('keydown', event => {
+    //   this.setState({
+    //         typing_msg: <p>Typing...</p>
+    //   })
+    // })
+    socket.on('typ_msg', (msg)=>{
+      console.log('MSG ', msg);
+      console.log('Room_id',data._id);
+      this.setState({
+        typing_msg:  <p>{msg}</p>
+      })
+    });
+
+    socket.on('keyUp_msg', (msg)=>{
+      this.setState({
+        typing_msg: msg
+      })
+    });
+
     var self = this;
     const { data } = this.props.location;
+    // process.stdin.on('keypress', (key, press)=>{
+    //   this.setState({
+    //     typing_msg: <p>Typing...</p>
+    //   })
+    // })
     setInterval(function() {
       axios
         .get("http://localhost:5000/api/getMessageList", {
@@ -40,6 +85,7 @@ class MessagePage extends React.Component {
           }
         })
         .then(response => {
+          console.log(response);
           self.setState({
             messages: response.data
           });
@@ -47,7 +93,18 @@ class MessagePage extends React.Component {
     }, 1000);
   }
 
+
+  sendSocketIO() {
+    socket.emit('example_message', 'demo');
+  }
   render() {
+    // socket.on('onkeypress', (data)=>{
+    //   console.log('Data ', data) 
+    //   this.setState({
+    //     typing_msg: <p>Typing...</p>
+    //   })
+    // })
+    
     return (
       <div className="app">
         <Title />
@@ -55,8 +112,17 @@ class MessagePage extends React.Component {
           roomId={this.state.roomId}
           messages={this.state.messages} //dummy data change later
         />
-        <SendMessageForm roomId={this.state.roomId} />
+        
+        <div>
+
+            {this.state.typing_msg}
+            
+         
+        <SendMessageForm roomId={this.state.roomId}/>
+        </div>
+        
       </div>
+      
     );
   }
 }
@@ -115,7 +181,7 @@ class SendMessageForm extends React.Component {
       })
       .then(response => {
         //get from backend
-        console.log(response);
+        console.log("Response from Send Message API",response);
       });
   }
 
@@ -127,7 +193,14 @@ class SendMessageForm extends React.Component {
           value={this.state.message}
           placeholder="Type your message and hit ENTER"
           type="text"
+          onKeyDown={()=>{
+            socket.emit('Hello', this.state.roomId);
+          }}
+          onKeyUp={()=>{
+            socket.emit('keyUp', '');
+          }}
         />
+        <button type="submit"  value="SubmitMessages" onClick={this.handleSubmit.bind(this)}>Submit</button>
       </form>
     );
   }
@@ -137,3 +210,4 @@ function Title() {
   return <p className="title">My Chat Room</p>;
 }
 export default MessagePage;
+
