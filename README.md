@@ -1,7 +1,7 @@
 npm install
 npm start
 
-Tasks
+Tasks TO DO
 Build a web UI for messaging app
 
 1. Authentication Page - User can register and login

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
+import cookie from 'react-cookies';
 
 import { userActions } from "../_actions";
 
@@ -31,6 +32,8 @@ class LoginPage extends React.Component {
 
     this.setState({ submitted: true });
     const { email, password } = this.state;
+    cookie.save('emails', this.state.email);
+    console.log("MEailssss",this.state.email);
     if (email && password) {
       this.props.login(email, password);
     }

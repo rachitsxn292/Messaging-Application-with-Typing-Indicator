@@ -5,7 +5,7 @@ const message_schema=mongoose.Schema({
 
     _id: mongoose.Schema.Types.ObjectId,
     roomId:mongoose.Schema.Types.ObjectId,
-    // userId:mongoose.Schema.Types.ObjectId,
+    userId:String,
     message:String,
     created:Date
 
