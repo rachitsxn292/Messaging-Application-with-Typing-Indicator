@@ -2,6 +2,8 @@ var MongoClient = require("mongodb").MongoClient;
 var assert = require("assert");
 const express = require('express');
 const app = express();
+const axios = require('axios')
+
 // app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
 // connect string for mongodb server running locally, connecting to a database called test
@@ -18,22 +20,22 @@ const message = require("../schema/message_model");
 
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-io.on('connection', function(socket){
+io.on('connection', function (socket) {
   console.log('a user connected');
-  socket.on('disconnect', function(){
+  socket.on('disconnect', function () {
     console.log('User Disconnected');
   });
-  socket.on('Hello', function(msg){
+  socket.on('Hello', function (msg) {
     console.log('message: ' + msg);
-    socket.broadcast.emit('typ_msg', msg +' typing...');
+    socket.broadcast.emit('typ_msg', msg + ' typing...');
   });
-  socket.on('keyUp', function(msg){
+  socket.on('keyUp', function (msg) {
     socket.broadcast.emit('keyUp_msg', '');
   })
 });
 io.listen(8000);
 
-exports.getMessageList = function(req, res) {
+exports.getMessageList = function (req, res) {
   console.log("Print id  " + req.query.roomId);
   // var data = {
   //   // buyerId: req.query.buyerId,
@@ -41,22 +43,47 @@ exports.getMessageList = function(req, res) {
   //   roomId: req.query.roomId
   // };
 
-  message.find({ roomId: req.query.roomId }, function(err, doc) {
+  message.find({ roomId: req.query.roomId }, function (err, doc) {
     if (doc) {
       console.log("doc found");
       console.log(doc);
-      res.send(doc);
-    } else {
+      var messages = [];
+      index = 0;
+      let loopArray = (arr)=>{
+        let proceed = ()=>{
+          index++;
+          if(index < doc.length){
+            loopArray(arr)
+          }else{
+            res.send(messages);
+          }
+        };
+        console.log("Sending Request Number = "+index);
+      let id = doc[index]._id
+      axios.get('http://172.20.10.12:5000/getMessage?messageId=' + id).then((response) => {
+            console.log(response.data);
+            let resp = response.data || {}
+            var message = {
+              messageId: doc[index]._id,
+              message: resp.message,
+              sentBy: doc[index].userId
+            };
+            messages.push(message);
+            proceed()
+          });
+      };
+      loopArray(doc)
+     } else {
       console.log("NO doc found");
       console.log(err);
     }
   });
 };
 
-exports.sendMessage = function(req, res) {
+exports.sendMessage = function (req, res) {
   var content = req.query.messages;
   var roomId = req.query.roomId;
-  console.log("send Message req section",content);
+  console.log("send Message req section", content);
 
   var today = new Date();
 
@@ -69,7 +96,27 @@ exports.sendMessage = function(req, res) {
   message1
     .save()
     .then(resul => {
-      console.log("send Message Saved",resul);
+      console.log("send Message Saved", resul);
+
+      //call to the other component
+      axios.post('http://172.20.10.12:5000/addMessage', {
+        messageId: "23423",
+        message: "hjjytrj"
+      },{
+        headers : {
+          'Content-Type' : 'application/json'
+        }
+      })
+        .then((res) => {
+
+          console.log(res.success)
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+
+
+
       console.log("message enrolled");
       res.send({
         code: 200,
@@ -81,8 +128,8 @@ exports.sendMessage = function(req, res) {
     });
 };
 
-exports.getChatRoom = function(req, res) {
-  chatroom.find({}, function(err, doc) {
+exports.getChatRoom = function (req, res) {
+  chatroom.find({}, function (err, doc) {
     if (doc) {
       console.log("doc found");
       console.log(doc);
