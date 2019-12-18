@@ -90,7 +90,7 @@ class MessagePage extends React.Component {
             messages: response.data
           });
         });
-    }, 20000);
+    }, 4000);
   }
 
 

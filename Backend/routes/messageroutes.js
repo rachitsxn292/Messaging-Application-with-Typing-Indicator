@@ -57,19 +57,26 @@ exports.getMessageList = function (req, res) {
         };
         console.log("Sending Request Number = "+index);
       let id = doc[index]._id
-      axios.get('http://172.20.10.12:5000/getMessage?messageId=' + id).then((response) => {
+      axios.get('http://10.0.0.81:5000/getMessage?messageId=' + id).then((response) => {
             console.log(response.data);
             let resp = response.data || {}
             var message = {
-              messageId: doc[index]._id,
+              messageId: id,
               message: resp.message,
-              sentBy: doc[index].userId
+              //sentBy: doc[index].userId
             };
             messages.push(message);
             proceed()
-          });
+          }).catch(e=>{console.log("ERROR 501");proceed();});
       };
-      loopArray(doc)
+      if(doc.length){
+        loopArray(doc)
+      }
+      else{
+        res.send([]);
+      }
+      
+
      } else {
       console.log("NO doc found");
       console.log(err);
@@ -88,7 +95,7 @@ exports.sendMessage = function (req, res) {
     _id: new mongoose.Types.ObjectId(),
     message: content,
     roomId: roomId,
-    userId: emailid,
+    //userId: emailid,
     created: today
   });
   message1
@@ -97,9 +104,9 @@ exports.sendMessage = function (req, res) {
       console.log("send Message Saved", resul);
 
       //call to the other component
-      axios.post('http://172.20.10.12:5000/addMessage', {
-        messageId: "23423",
-        message: "hjjytrj"
+      axios.post('http://10.0.0.81:5000/addMessage', {
+        messageId: resul._id,
+        message: resul.message
       },{
         headers : {
           'Content-Type' : 'application/json'
